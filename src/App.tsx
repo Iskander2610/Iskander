@@ -1,23 +1,18 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { DjDeck } from './components/DjDeck';
+import { AuthControls } from './components/AuthControls';
+import { LanguageSwitch } from './components/LanguageSwitch';
 import { PlayMusicButton } from './components/PlayMusicButton';
 import { RecordingPanel } from './components/RecordingPanel';
 import { ShareRecordButton } from './components/ShareRecordButton';
-import { SoundButton } from './components/SoundButton';
+import { Soundboard } from './components/Soundboard';
 import { handleArrowKey, playRecordedAction } from './lib/djControls';
 import { playMusicTrack } from './lib/musicTrack';
 import { createMusicPerformance } from './lib/randomMusic';
 import type { NewRecordedAction, RecordedAction } from './lib/recording';
-import {
-  playMemeSound,
-  russianSoundNames,
-  soundKeys,
-  soundNames,
-  updateDiscSound,
-} from './lib/soundButtons';
+import { supabase } from './lib/supabase';
+import { playMemeSound, soundKeys, soundNames, updateDiscSound } from './lib/soundButtons';
 
 type Language = 'en' | 'ru';
-
 export default function App() {
   const [language, setLanguage] = useState<Language>('en');
   const [discAngle, setDiscAngle] = useState(0);
@@ -25,19 +20,19 @@ export default function App() {
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+  const [isSignInOpen, setIsSignInOpen] = useState(false);
+  const [profileName, setProfileName] = useState('');
+  const [profileAvatar, setProfileAvatar] = useState('');
   const [recording, setRecording] = useState<RecordedAction[]>([]);
   const recordingStart = useRef(0);
   const nextRecordingId = useRef(1);
   const playbackTimers = useRef<number[]>([]);
-  const visibleNames = language === 'en' ? soundNames : russianSoundNames;
-
   const clearPlayback = useCallback(() => {
     playbackTimers.current.forEach((timer) => window.clearTimeout(timer));
     playbackTimers.current = [];
     setIsPlaying(false);
     setIsMusicPlaying(false);
   }, []);
-
   const recordAction = useCallback((action: NewRecordedAction) => {
     if (!recordingStart.current) return;
     const time = Number(((performance.now() - recordingStart.current) / 1000).toFixed(1));
@@ -60,7 +55,21 @@ export default function App() {
   useEffect(() => clearPlayback, [clearPlayback]);
 
   useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      const username = data.user?.user_metadata.username;
+      if (typeof username === 'string') setProfileName(username);
+    });
+    setProfileAvatar(localStorage.getItem('profile-avatar') ?? '');
+  }, []);
+
+  const updateProfileAvatar = (avatarUrl: string) => {
+    setProfileAvatar(avatarUrl);
+    localStorage.setItem('profile-avatar', avatarUrl);
+  };
+
+  useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (isSignInOpen) return;
       if (handleArrowKey(event.key, setDiscAngle, setSpinSpeed, recordAction)) {
         event.preventDefault();
         return;
@@ -73,7 +82,7 @@ export default function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [recordAction, recordSound]);
+  }, [isSignInOpen, recordAction, recordSound]);
 
   const startRecording = () => {
     clearPlayback();
@@ -114,6 +123,15 @@ export default function App() {
   return (
     <main className="button-page">
       <ShareRecordButton recording={recording} />
+      <AuthControls
+        avatarUrl={profileAvatar}
+        isSignInOpen={isSignInOpen}
+        onAvatarChange={updateProfileAvatar}
+        onCloseSignIn={() => setIsSignInOpen(false)}
+        onOpenSignIn={() => setIsSignInOpen(true)}
+        onProfileCreated={setProfileName}
+        username={profileName}
+      />
       <PlayMusicButton isPlaying={isMusicPlaying} onPlay={playRandomMusic} />
       <p className="copyright-label">Copyright Iskander</p>
       <RecordingPanel
@@ -124,27 +142,8 @@ export default function App() {
         onStop={stopRecording}
         onPlay={playRecording}
       />
-      <div className="language-switch" aria-label="Language switch">
-        <button className={language === 'en' ? 'active' : ''} type="button" onClick={() => setLanguage('en')}>
-          English
-        </button>
-        <button className={language === 'ru' ? 'active' : ''} type="button" onClick={() => setLanguage('ru')}>
-          Русский
-        </button>
-      </div>
-      <div className="button-sides">
-        <div className="button-grid button-grid--left">
-          {visibleNames.slice(0, 10).map((name, index) => (
-            <SoundButton index={index} key={soundNames[index]} name={name} onRecordSound={recordSound} />
-          ))}
-        </div>
-        <DjDeck discAngle={discAngle} spinSpeed={spinSpeed} />
-        <div className="button-grid button-grid--right">
-          {visibleNames.slice(10).map((name, index) => (
-            <SoundButton index={index + 10} key={soundNames[index + 10]} name={name} onRecordSound={recordSound} />
-          ))}
-        </div>
-      </div>
+      <LanguageSwitch language={language} onLanguageChange={setLanguage} />
+      <Soundboard discAngle={discAngle} language={language} onRecordSound={recordSound} spinSpeed={spinSpeed} />
     </main>
   );
 }
