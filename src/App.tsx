@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AuthControls } from './components/AuthControls';
-import { LanguageSwitch } from './components/LanguageSwitch';
 import { PlayMusicButton } from './components/PlayMusicButton';
 import { RecordingPanel } from './components/RecordingPanel';
 import { ShareRecordButton } from './components/ShareRecordButton';
@@ -12,9 +11,7 @@ import type { NewRecordedAction, RecordedAction } from './lib/recording';
 import { supabase } from './lib/supabase';
 import { playMemeSound, soundKeys, soundNames, updateDiscSound } from './lib/soundButtons';
 
-type Language = 'en' | 'ru';
 export default function App() {
-  const [language, setLanguage] = useState<Language>('en');
   const [discAngle, setDiscAngle] = useState(0);
   const [spinSpeed, setSpinSpeed] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
@@ -142,8 +139,7 @@ export default function App() {
         onStop={stopRecording}
         onPlay={playRecording}
       />
-      <LanguageSwitch language={language} onLanguageChange={setLanguage} />
-      <Soundboard discAngle={discAngle} language={language} onRecordSound={recordSound} spinSpeed={spinSpeed} />
+      <Soundboard discAngle={discAngle} onRecordSound={recordSound} spinSpeed={spinSpeed} />
     </main>
   );
 }

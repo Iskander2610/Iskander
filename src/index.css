@@ -111,25 +111,6 @@ button.small { padding: 6px 10px; font-size: 14px; }
   overflow-x: hidden;
 }
 
-.language-switch {
-  display: flex;
-  gap: 8px;
-}
-
-.language-switch button {
-  border-radius: 8px;
-  padding: 7px 10px;
-  background: #fff;
-  color: var(--soft);
-  border: 1px solid var(--line);
-  font-size: 14px;
-}
-
-.language-switch button.active {
-  background: var(--clay);
-  color: #fff;
-}
-
 .share-record {
   position: fixed;
   top: 14px;
