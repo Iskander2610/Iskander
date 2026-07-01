@@ -31,8 +31,9 @@ let discVolume: GainNode | undefined;
 export function playMemeSound(index: number) {
   const audio = getAudio();
   const volume = audio.createGain();
+  const peakVolume = index === 12 ? 0.58 : 0.28;
   volume.gain.setValueAtTime(0.0001, audio.currentTime);
-  volume.gain.exponentialRampToValueAtTime(0.28, audio.currentTime + 0.02);
+  volume.gain.exponentialRampToValueAtTime(peakVolume, audio.currentTime + 0.02);
   volume.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + 0.72);
   volume.connect(audio.destination);
   soundPatterns[index % soundPatterns.length](audio, volume);

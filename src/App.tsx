@@ -4,6 +4,7 @@ import { PlayMusicButton } from './components/PlayMusicButton';
 import { RecordingPanel } from './components/RecordingPanel';
 import { ShareRecordButton } from './components/ShareRecordButton';
 import { Soundboard } from './components/Soundboard';
+import { isBannedUser } from './lib/bans';
 import { handleArrowKey, playRecordedAction } from './lib/djControls';
 import { playMusicTrack } from './lib/musicTrack';
 import { createMusicPerformance } from './lib/randomMusic';
@@ -18,6 +19,7 @@ export default function App() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [isSignInOpen, setIsSignInOpen] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false);
   const [profileName, setProfileName] = useState('');
   const [profileAvatar, setProfileAvatar] = useState('');
   const [recording, setRecording] = useState<RecordedAction[]>([]);
@@ -53,6 +55,11 @@ export default function App() {
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
+      if (data.user && isBannedUser(data.user)) {
+        setIsBlocked(true);
+        void supabase.auth.signOut();
+        return;
+      }
       const username = data.user?.user_metadata.username;
       if (typeof username === 'string') setProfileName(username);
     });
@@ -67,6 +74,7 @@ export default function App() {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (isSignInOpen) return;
+      if (isBlocked) return;
       if (handleArrowKey(event.key, setDiscAngle, setSpinSpeed, recordAction)) {
         event.preventDefault();
         return;
@@ -79,7 +87,18 @@ export default function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isSignInOpen, recordAction, recordSound]);
+  }, [isBlocked, isSignInOpen, recordAction, recordSound]);
+
+  if (isBlocked) {
+    return (
+      <main className="blocked-page">
+        <section>
+          <h1>You are banned from this game.</h1>
+          <p>This account cannot join Iskander DJ.</p>
+        </section>
+      </main>
+    );
+  }
 
   const startRecording = () => {
     clearPlayback();
