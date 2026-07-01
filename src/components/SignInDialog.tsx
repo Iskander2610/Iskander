@@ -33,6 +33,10 @@ export function SignInDialog({ onAccountCreated, onClose }: SignInDialogProps) {
       setMessage('Please write a username.');
       return;
     }
+    if (isBannedUsername(cleanUsername)) {
+      setMessage('This username is banned.');
+      return;
+    }
 
     setIsSubmitting(true);
     setMessage('');
@@ -88,6 +92,10 @@ export function SignInDialog({ onAccountCreated, onClose }: SignInDialogProps) {
 
 function makeAccountEmail(username: string) {
   return `dj-${hashUsername(username)}@iskanderdj.app`;
+}
+
+function isBannedUsername(username: string) {
+  return username.toLowerCase() === 'alinur';
 }
 
 async function createAccount(email: string, password: string, username: string) {
