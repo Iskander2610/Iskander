@@ -60,7 +60,8 @@ export default function App() {
         void supabase.auth.signOut();
         return;
       }
-      const username = data.user?.user_metadata.username;
+      const metadata = data.user?.user_metadata;
+      const username = metadata?.username ?? metadata?.name ?? metadata?.full_name ?? data.user?.email?.split('@')[0];
       if (typeof username === 'string') setProfileName(username);
     });
     setProfileAvatar(localStorage.getItem('profile-avatar') ?? '');
@@ -75,6 +76,7 @@ export default function App() {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (isSignInOpen) return;
       if (isBlocked) return;
+      if (!profileName) return;
       if (handleArrowKey(event.key, setDiscAngle, setSpinSpeed, recordAction)) {
         event.preventDefault();
         return;
@@ -87,7 +89,7 @@ export default function App() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isBlocked, isSignInOpen, recordAction, recordSound]);
+  }, [isBlocked, isSignInOpen, profileName, recordAction, recordSound]);
 
   if (isBlocked) {
     return (
@@ -96,6 +98,27 @@ export default function App() {
           <h1>You are banned from this game.</h1>
           <p>This account cannot join Iskander DJ.</p>
         </section>
+      </main>
+    );
+  }
+
+  if (!profileName) {
+    return (
+      <main className="join-page">
+        <AuthControls
+          avatarUrl={profileAvatar}
+          isSignInOpen={isSignInOpen}
+          onAvatarChange={updateProfileAvatar}
+          onCloseSignIn={() => setIsSignInOpen(false)}
+          onOpenSignIn={() => setIsSignInOpen(true)}
+          onProfileCreated={setProfileName}
+          username={profileName}
+        />
+        <section>
+          <h1>Join Iskander DJ</h1>
+          <p>Sign in first to play the game.</p>
+        </section>
+        <p className="copyright-label">Copyright Iskander</p>
       </main>
     );
   }
