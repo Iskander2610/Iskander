@@ -508,12 +508,12 @@ button.small { padding: 6px 10px; font-size: 14px; }
 }
 
 .button-sides {
-  width: min(1440px, 100%);
+  width: min(900px, 100%);
   display: grid;
-  grid-template-columns: minmax(230px, 1fr) minmax(460px, 560px) minmax(230px, 1fr);
+  grid-template-columns: minmax(190px, 220px) minmax(300px, 360px) minmax(190px, 220px);
   justify-items: center;
   align-items: center;
-  gap: clamp(8px, 1.6vw, 22px);
+  gap: clamp(2px, 0.6vw, 8px);
 }
 
 .deck-stack {
@@ -659,62 +659,42 @@ button.small { padding: 6px 10px; font-size: 14px; }
 }
 
 .button-grid {
-  width: min(100%, 260px);
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  align-items: center;
-  gap: 3px;
+  width: min(100%, 220px);
 }
 
-.button-grid--left { justify-self: start; }
-.button-grid--right { justify-self: end; }
+.button-grid--left { justify-self: end; }
+.button-grid--right { justify-self: start; }
 
 .new-button-row {
-  width: min(100%, 560px);
+  width: min(100%, 440px);
   display: grid;
-  grid-template-columns: repeat(4, minmax(95px, 1fr));
+  grid-template-columns: repeat(4, minmax(92px, 1fr));
   gap: 6px;
 }
 
-.new-button-row .sound-button {
-  grid-template-columns: 1fr;
-  justify-items: center;
-  gap: 4px;
-  text-align: center;
-}
-
-.new-button-row .sound-button p {
-  min-height: 24px;
-  font-size: 10px;
-  line-height: 1.15;
-}
-
-.new-button-row .sound-button kbd {
-  min-width: 22px;
-  padding: 3px 5px;
-  font-size: 11px;
-}
-
-.button-column {
+.button-group {
   display: grid;
-  gap: 5px;
+  grid-template-columns: repeat(2, minmax(84px, 1fr));
+  gap: 26px 5px;
   min-width: 0;
   width: 100%;
 }
 
 .sound-button {
   display: grid;
-  grid-template-columns: 52px minmax(0, 1fr) 22px;
+  grid-template-columns: 52px 28px;
   align-items: center;
+  justify-content: center;
   gap: 5px;
-  text-align: left;
 }
 
 .sound-button p {
-  color: var(--ink);
-  font-size: 10px;
-  font-weight: 550;
-  overflow-wrap: anywhere;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 .sound-button kbd {
@@ -768,8 +748,9 @@ button.small { padding: 6px 10px; font-size: 14px; }
 
 @media (max-width: 1100px) {
   .button-sides {
-    grid-template-columns: minmax(190px, 1fr) minmax(360px, 440px) minmax(190px, 1fr);
-    gap: 8px;
+    width: min(780px, 100%);
+    grid-template-columns: minmax(160px, 190px) minmax(250px, 310px) minmax(160px, 190px);
+    gap: 4px;
   }
 
   .dj-center { width: min(170px, 100%); }
@@ -777,25 +758,23 @@ button.small { padding: 6px 10px; font-size: 14px; }
   .center-disc { width: clamp(88px, 12vw, 120px); }
 
   .button-grid {
-    width: min(100%, 230px);
-    grid-template-columns: minmax(0, 1fr);
-    gap: 2px;
+    width: min(100%, 190px);
+  }
+
+  .button-group {
+    grid-template-columns: repeat(2, minmax(72px, 1fr));
+    gap: 18px 4px;
   }
 
   .new-button-row {
-    width: min(100%, 440px);
-    grid-template-columns: repeat(4, minmax(76px, 1fr));
+    width: min(100%, 392px);
+    grid-template-columns: repeat(4, minmax(82px, 1fr));
     gap: 4px;
   }
 
   .sound-button {
-    grid-template-columns: 42px minmax(0, 1fr) 18px;
+    grid-template-columns: 42px 22px;
     gap: 4px;
-  }
-
-  .sound-button p {
-    font-size: 8px;
-    overflow-wrap: anywhere;
   }
 
   .disc-tutorial {
@@ -846,19 +825,27 @@ button.small { padding: 6px 10px; font-size: 14px; }
   .dj-center { width: min(220px, 100%); }
 
   .button-grid {
-    width: min(430px, 100%);
-    grid-template-columns: repeat(2, minmax(150px, 1fr));
+    width: min(250px, 100%);
+    grid-template-columns: repeat(2, minmax(96px, 1fr));
     gap: 3px;
   }
 
+  .button-grid--left,
+  .button-grid--right {
+    justify-self: center;
+  }
+
+  .button-group {
+    grid-template-columns: repeat(2, minmax(96px, 1fr));
+    gap: 18px 4px;
+  }
+
   .new-button-row {
-    width: min(430px, 100%);
-    grid-template-columns: repeat(2, minmax(150px, 1fr));
+    width: min(250px, 100%);
+    grid-template-columns: repeat(2, minmax(96px, 1fr));
   }
 
   .sound-button {
-    grid-template-columns: 56px minmax(0, 1fr) 22px;
+    grid-template-columns: 56px 24px;
   }
-
-  .sound-button p { font-size: 10px; }
 }
