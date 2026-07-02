@@ -496,24 +496,31 @@ button.small { padding: 6px 10px; font-size: 14px; }
 }
 
 .button-sides {
-  width: min(1240px, 100%);
+  width: min(1440px, 100%);
   display: grid;
-  grid-template-columns: minmax(270px, 1fr) minmax(190px, 250px) minmax(270px, 1fr);
+  grid-template-columns: minmax(230px, 1fr) minmax(460px, 560px) minmax(230px, 1fr);
   justify-items: center;
   align-items: center;
-  gap: clamp(12px, 2.2vw, 30px);
+  gap: clamp(8px, 1.6vw, 22px);
+}
+
+.deck-stack {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  width: 100%;
 }
 
 .dj-center {
   display: grid;
   justify-items: center;
   gap: 10px;
-  width: min(260px, 100%);
+  width: min(220px, 100%);
 }
 
 .dj-deck {
   position: relative;
-  width: clamp(150px, 17vw, 220px);
+  width: clamp(135px, 15vw, 200px);
   aspect-ratio: 1.12;
   flex: 0 0 auto;
   display: grid;
@@ -527,7 +534,7 @@ button.small { padding: 6px 10px; font-size: 14px; }
 }
 
 .center-disc {
-  width: clamp(110px, 13vw, 170px);
+  width: clamp(100px, 12vw, 155px);
   aspect-ratio: 1;
   border-radius: 50%;
   position: relative;
@@ -638,30 +645,60 @@ button.small { padding: 6px 10px; font-size: 14px; }
 }
 
 .button-grid {
-  width: min(100%, 385px);
+  width: min(100%, 260px);
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: repeat(5, auto);
-  grid-auto-flow: column;
-  gap: 8px;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  gap: 3px;
 }
 
-.button-grid--left,
-.button-grid--right {
-  position: static;
+.button-grid--left { justify-self: start; }
+.button-grid--right { justify-self: end; }
+
+.new-button-row {
+  width: min(100%, 560px);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(95px, 1fr));
+  gap: 6px;
+}
+
+.new-button-row .sound-button {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.new-button-row .sound-button p {
+  min-height: 24px;
+  font-size: 10px;
+  line-height: 1.15;
+}
+
+.new-button-row .sound-button kbd {
+  min-width: 22px;
+  padding: 3px 5px;
+  font-size: 11px;
+}
+
+.button-column {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  width: 100%;
 }
 
 .sound-button {
   display: grid;
-  grid-template-columns: 72px minmax(0, 1fr) 26px;
+  grid-template-columns: 52px minmax(0, 1fr) 22px;
   align-items: center;
-  gap: 8px;
+  gap: 5px;
   text-align: left;
 }
 
 .sound-button p {
   color: var(--ink);
-  font-size: 13px;
+  font-size: 10px;
   font-weight: 800;
   overflow-wrap: anywhere;
 }
@@ -717,26 +754,33 @@ button.small { padding: 6px 10px; font-size: 14px; }
 
 @media (max-width: 1100px) {
   .button-sides {
-    grid-template-columns: minmax(190px, 1fr) minmax(160px, 210px) minmax(190px, 1fr);
-    gap: 10px;
+    grid-template-columns: minmax(190px, 1fr) minmax(360px, 440px) minmax(190px, 1fr);
+    gap: 8px;
   }
 
-  .dj-center { width: min(210px, 100%); }
-  .dj-deck { width: clamp(140px, 18vw, 190px); }
-  .center-disc { width: clamp(100px, 14vw, 140px); }
+  .dj-center { width: min(170px, 100%); }
+  .dj-deck { width: clamp(120px, 15vw, 160px); }
+  .center-disc { width: clamp(88px, 12vw, 120px); }
 
   .button-grid {
-    width: min(100%, 305px);
-    gap: 6px;
+    width: min(100%, 230px);
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2px;
+  }
+
+  .new-button-row {
+    width: min(100%, 440px);
+    grid-template-columns: repeat(4, minmax(76px, 1fr));
+    gap: 4px;
   }
 
   .sound-button {
-    grid-template-columns: 58px minmax(0, 1fr) 22px;
-    gap: 5px;
+    grid-template-columns: 42px minmax(0, 1fr) 18px;
+    gap: 4px;
   }
 
   .sound-button p {
-    font-size: 10px;
+    font-size: 8px;
     overflow-wrap: anywhere;
   }
 
@@ -784,16 +828,23 @@ button.small { padding: 6px 10px; font-size: 14px; }
     gap: 18px;
   }
 
-  .dj-center { order: -1; }
+  .deck-stack { order: -1; }
+  .dj-center { width: min(220px, 100%); }
 
   .button-grid {
-    width: min(390px, 100%);
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: min(430px, 100%);
+    grid-template-columns: repeat(2, minmax(150px, 1fr));
+    gap: 3px;
+  }
+
+  .new-button-row {
+    width: min(430px, 100%);
+    grid-template-columns: repeat(2, minmax(150px, 1fr));
   }
 
   .sound-button {
-    grid-template-columns: 66px minmax(0, 1fr) 24px;
+    grid-template-columns: 56px minmax(0, 1fr) 22px;
   }
 
-  .sound-button p { font-size: 12px; }
+  .sound-button p { font-size: 10px; }
 }

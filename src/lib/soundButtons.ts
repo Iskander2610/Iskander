@@ -1,27 +1,4 @@
-export const buttonColors = [
-  ['#ff4b4b', '#ff2424', '#a81414'], ['#b45cff', '#8a2be2', '#5b159b'],
-  ['#4dabff', '#1c7ed6', '#0b4f8a'], ['#51cf66', '#2f9e44', '#1f6b2d'],
-  ['#ffd43b', '#f59f00', '#a96800'], ['#ff922b', '#f76707', '#a63f00'],
-  ['#f06595', '#d6336c', '#8a1f45'], ['#20c997', '#0ca678', '#087f5b'],
-  ['#845ef7', '#5f3dc4', '#3b2582'], ['#22b8cf', '#1098ad', '#0b6978'],
-  ['#ff6b6b', '#fa5252', '#b02a37'], ['#cc5de8', '#ae3ec9', '#702184'],
-  ['#339af0', '#228be6', '#14599a'], ['#69db7c', '#40c057', '#2b8a3e'],
-  ['#ffe066', '#fab005', '#b58100'], ['#ffa94d', '#fd7e14', '#b45100'],
-  ['#faa2c1', '#e64980', '#a61e4d'], ['#63e6be', '#12b886', '#087f5b'],
-  ['#9775fa', '#7048e8', '#4327a8'], ['#66d9e8', '#15aabf', '#0b7285'],
-] as const;
-
-export const soundNames = [
-  'Womp Drop', 'Bonk Down', 'Alien Rise', 'Boing Climb', 'Fail Drop',
-  'Double Bonk', 'Static Burst', 'Siren Beep', 'Slide Down', 'Bass Steps',
-  'Laser Up', 'Robot Beep', 'Slow Rise', 'Sad Slide', 'Tiny Static',
-  'Arcade Jump', 'Zap Fall', 'Meme Loop', 'Flat Honk', 'Fast Fall',
-] as const;
-
-export const soundKeys = [
-  'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',
-  'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'z',
-] as const;
+export { buttonColors, soundKeys, soundNames } from './soundData';
 
 let sharedAudio: AudioContext | undefined;
 let discNoise: AudioBufferSourceNode | undefined;
@@ -118,11 +95,23 @@ const soundPatterns = [
   (audio: AudioContext, volume: GainNode) => playNotes(audio, volume, [185, 247, 330, 247], 0.1, 'sine'),
   (audio: AudioContext, volume: GainNode) => playSweep(audio, volume, 260, 260, 0, 0.5, 'triangle'),
   (audio: AudioContext, volume: GainNode) => playNotes(audio, volume, [900, 700, 500, 300], 0.045, 'square'),
+  (audio: AudioContext, volume: GainNode) => playAirhorn(audio, volume),
+  (audio: AudioContext, volume: GainNode) => playSweep(audio, volume, 1200, 120, 0, 0.36, 'sawtooth'),
+  (audio: AudioContext, volume: GainNode) => playNotes(audio, volume, [55, 82, 110], 0.16, 'sine'),
+  (audio: AudioContext, volume: GainNode) => playSweep(audio, volume, 700, 40, 0, 0.62, 'triangle'),
+  (audio: AudioContext, volume: GainNode) => playNotes(audio, volume, [330, 440, 330, 440], 0.09, 'square'),
+  (audio: AudioContext, volume: GainNode) => playGlitch(audio, volume),
+  (audio: AudioContext, volume: GainNode) => playNotes(audio, volume, [880, 620, 880, 620, 1040], 0.035, 'sawtooth'),
+  (audio: AudioContext, volume: GainNode) => playNotes(audio, volume, [740, 740, 370, 740], 0.08, 'square'),
+  (audio: AudioContext, volume: GainNode) => playSweep(audio, volume, 1600, 420, 0, 0.2, 'sawtooth'),
+  (audio: AudioContext, volume: GainNode) => playNotes(audio, volume, [520, 660, 780, 1040], 0.055, 'triangle'),
+  (audio: AudioContext, volume: GainNode) => playNotes(audio, volume, [220, 220, 330, 220], 0.075, 'square'),
+  (audio: AudioContext, volume: GainNode) => playEchoBlip(audio, volume),
+  (audio: AudioContext, volume: GainNode) => playNotes(audio, volume, [392, 523, 659, 784], 0.05, 'sawtooth'),
+  (audio: AudioContext, volume: GainNode) => playSweep(audio, volume, 960, 180, 0, 0.3, 'square'),
+  (audio: AudioContext, volume: GainNode) => playNotes(audio, volume, [700, 500, 700, 500, 900], 0.045, 'sine'),
+  (audio: AudioContext, volume: GainNode) => playDrumRoll(audio, volume),
 ] as const;
-
-function playNotes(audio: AudioContext, volume: GainNode, notes: number[], step: number, type: OscillatorType) {
-  notes.forEach((note, index) => playSweep(audio, volume, note, note * 0.96, index * step, step * 0.8, type));
-}
 
 function playSweep(audio: AudioContext, volume: GainNode, start: number, end: number, delay: number, duration: number, type: OscillatorType) {
   const tone = audio.createOscillator();
@@ -134,6 +123,10 @@ function playSweep(audio: AudioContext, volume: GainNode, start: number, end: nu
   tone.stop(audio.currentTime + delay + duration);
 }
 
+function playNotes(audio: AudioContext, volume: GainNode, notes: number[], step: number, type: OscillatorType) {
+  notes.forEach((note, index) => playSweep(audio, volume, note, note * 0.96, index * step, step * 0.8, type));
+}
+
 function playNoise(audio: AudioContext, volume: GainNode, duration: number) {
   const buffer = audio.createBuffer(1, audio.sampleRate * duration, audio.sampleRate);
   const data = buffer.getChannelData(0);
@@ -142,4 +135,17 @@ function playNoise(audio: AudioContext, volume: GainNode, duration: number) {
   noise.buffer = buffer;
   noise.connect(volume);
   noise.start();
+}
+
+function playAirhorn(audio: AudioContext, volume: GainNode) {
+  [420, 520, 620].forEach((note, index) => playSweep(audio, volume, note, note - 30, index * 0.08, 0.16 + index * 0.02, 'sawtooth'));
+}
+function playGlitch(audio: AudioContext, volume: GainNode) {
+  [130, 520, 90, 760, 180, 420].forEach((note, index) => playSweep(audio, volume, note, note * 1.04, index * 0.035, 0.025, index % 2 ? 'square' : 'sawtooth'));
+}
+function playEchoBlip(audio: AudioContext, volume: GainNode) {
+  [760, 570, 430].forEach((note, index) => playSweep(audio, volume, note, note, index * 0.11, 0.06, 'sine'));
+}
+function playDrumRoll(audio: AudioContext, volume: GainNode) {
+  for (let index = 0; index < 8; index += 1) playNoise(audio, volume, 0.035 + index * 0.004);
 }

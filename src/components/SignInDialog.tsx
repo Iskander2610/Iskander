@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { isBannedName } from '../lib/bans';
+import { makeAccountEmail } from '../lib/accountAuth';
 import { supabase } from '../lib/supabase';
 
 type SignInDialogProps = {
@@ -91,10 +92,6 @@ export function SignInDialog({ onAccountCreated, onClose }: SignInDialogProps) {
   );
 }
 
-function makeAccountEmail(username: string) {
-  return `dj-${hashUsername(username)}@iskanderdj.app`;
-}
-
 async function createAccount(email: string, password: string, username: string) {
   const { error } = await supabase.auth.signUp({
     email,
@@ -102,12 +99,4 @@ async function createAccount(email: string, password: string, username: string) 
     options: { data: { username } },
   });
   return error;
-}
-
-function hashUsername(username: string) {
-  let hash = 0;
-  for (const letter of username) {
-    hash = (hash * 31 + letter.codePointAt(0)!) >>> 0;
-  }
-  return hash.toString(16);
 }

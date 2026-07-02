@@ -1,11 +1,16 @@
+import { LogInDialog } from './LogInDialog';
 import { ProfileMenu } from './ProfileMenu';
 import { SignInDialog } from './SignInDialog';
 
 type AuthControlsProps = {
   avatarUrl: string;
+  isLogInOpen: boolean;
   isSignInOpen: boolean;
   onAvatarChange: (avatarUrl: string) => void;
+  onCloseLogIn: () => void;
   onCloseSignIn: () => void;
+  onLogIn: (username: string) => void;
+  onOpenLogIn: () => void;
   onOpenSignIn: () => void;
   onProfileCreated: (username: string) => void;
   username: string;
@@ -13,9 +18,13 @@ type AuthControlsProps = {
 
 export function AuthControls({
   avatarUrl,
+  isLogInOpen,
   isSignInOpen,
   onAvatarChange,
+  onCloseLogIn,
   onCloseSignIn,
+  onLogIn,
+  onOpenLogIn,
   onOpenSignIn,
   onProfileCreated,
   username,
@@ -28,10 +37,13 @@ export function AuthControls({
         ) : (
           <button className="sign-in-button" type="button" onClick={onOpenSignIn}>Sign In</button>
         )}
-        <button className="sign-in-button" type="button">Log In</button>
+        <button className="sign-in-button" type="button" onClick={onOpenLogIn}>Log In</button>
       </div>
       {isSignInOpen && (
         <SignInDialog onAccountCreated={onProfileCreated} onClose={onCloseSignIn} />
+      )}
+      {isLogInOpen && (
+        <LogInDialog onClose={onCloseLogIn} onLoggedIn={onLogIn} />
       )}
     </>
   );

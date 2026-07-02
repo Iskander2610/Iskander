@@ -4,25 +4,24 @@ import { PlayMusicButton } from './components/PlayMusicButton';
 import { RecordingPanel } from './components/RecordingPanel';
 import { ShareRecordButton } from './components/ShareRecordButton';
 import { Soundboard } from './components/Soundboard';
-import { isBannedUser } from './lib/bans';
-import { handleArrowKey, playRecordedAction } from './lib/djControls';
+import { playRecordedAction } from './lib/djControls';
 import { playMusicTrack } from './lib/musicTrack';
 import { createMusicPerformance } from './lib/randomMusic';
 import type { NewRecordedAction, RecordedAction } from './lib/recording';
-import { supabase } from './lib/supabase';
-import { playMemeSound, soundKeys, soundNames, updateDiscSound } from './lib/soundButtons';
+import { soundKeys, soundNames, updateDiscSound } from './lib/soundButtons';
+import { useInspectBlocker } from './lib/useInspectBlocker';
+import { useKeyboardSounds } from './lib/useKeyboardSounds';
+import { useProfile } from './lib/useProfile';
 
 export default function App() {
+  useInspectBlocker();
   const [discAngle, setDiscAngle] = useState(0);
   const [spinSpeed, setSpinSpeed] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
-  const [isSignInOpen, setIsSignInOpen] = useState(false);
-  const [isBlocked, setIsBlocked] = useState(false);
-  const [profileName, setProfileName] = useState('');
-  const [profileAvatar, setProfileAvatar] = useState('');
   const [recording, setRecording] = useState<RecordedAction[]>([]);
+  const profile = useProfile();
   const recordingStart = useRef(0);
   const nextRecordingId = useRef(1);
   const playbackTimers = useRef<number[]>([]);
@@ -40,58 +39,44 @@ export default function App() {
   }, []);
 
   const recordSound = useCallback((index: number) => {
-    recordAction({
-      type: 'sound',
-      index,
-      label: `${soundKeys[index].toUpperCase()} ${soundNames[index]}`,
-    });
+    recordAction({ type: 'sound', index, label: `${soundKeys[index].toUpperCase()} ${soundNames[index]}` });
   }, [recordAction]);
-
   useEffect(() => {
     updateDiscSound(spinSpeed);
   }, [spinSpeed]);
-
   useEffect(() => clearPlayback, [clearPlayback]);
 
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user && isBannedUser(data.user)) {
-        setIsBlocked(true);
-        void supabase.auth.signOut();
-        return;
-      }
-      const metadata = data.user?.user_metadata;
-      const username = metadata?.username ?? metadata?.name ?? metadata?.full_name ?? data.user?.email?.split('@')[0];
-      if (typeof username === 'string') setProfileName(username);
-    });
-    setProfileAvatar(localStorage.getItem('profile-avatar') ?? '');
-  }, []);
+  useKeyboardSounds({
+    isDisabled: profile.isBlocked || profile.isLogInOpen || profile.isSignInOpen || !profile.profileName,
+    recordAction,
+    recordSound,
+    setDiscAngle,
+    setSpinSpeed,
+  });
 
-  const updateProfileAvatar = (avatarUrl: string) => {
-    setProfileAvatar(avatarUrl);
-    localStorage.setItem('profile-avatar', avatarUrl);
-  };
+  const authControls = (
+    <AuthControls
+      avatarUrl={profile.profileAvatar}
+      isLogInOpen={profile.isLogInOpen}
+      isSignInOpen={profile.isSignInOpen}
+      onAvatarChange={profile.updateProfileAvatar}
+      onCloseLogIn={() => profile.setIsLogInOpen(false)}
+      onCloseSignIn={() => profile.setIsSignInOpen(false)}
+      onLogIn={profile.setProfileName}
+      onOpenLogIn={() => {
+        profile.setIsSignInOpen(false);
+        profile.setIsLogInOpen(true);
+      }}
+      onOpenSignIn={() => {
+        profile.setIsLogInOpen(false);
+        profile.setIsSignInOpen(true);
+      }}
+      onProfileCreated={profile.setProfileName}
+      username={profile.profileName}
+    />
+  );
 
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (isSignInOpen) return;
-      if (isBlocked) return;
-      if (!profileName) return;
-      if (handleArrowKey(event.key, setDiscAngle, setSpinSpeed, recordAction)) {
-        event.preventDefault();
-        return;
-      }
-      const soundIndex = soundKeys.indexOf(event.key.toLowerCase() as (typeof soundKeys)[number]);
-      if (soundIndex < 0) return;
-      event.preventDefault();
-      playMemeSound(soundIndex);
-      recordSound(soundIndex);
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isBlocked, isSignInOpen, profileName, recordAction, recordSound]);
-
-  if (isBlocked) {
+  if (profile.isBlocked) {
     return (
       <main className="blocked-page">
         <section>
@@ -101,19 +86,10 @@ export default function App() {
       </main>
     );
   }
-
-  if (!profileName) {
+  if (!profile.profileName) {
     return (
       <main className="join-page">
-        <AuthControls
-          avatarUrl={profileAvatar}
-          isSignInOpen={isSignInOpen}
-          onAvatarChange={updateProfileAvatar}
-          onCloseSignIn={() => setIsSignInOpen(false)}
-          onOpenSignIn={() => setIsSignInOpen(true)}
-          onProfileCreated={setProfileName}
-          username={profileName}
-        />
+        {authControls}
         <section>
           <h1>Join Iskander DJ</h1>
           <p>Sign in first to play the game.</p>
@@ -122,7 +98,6 @@ export default function App() {
       </main>
     );
   }
-
   const startRecording = () => {
     clearPlayback();
     recordingStart.current = performance.now();
@@ -130,7 +105,6 @@ export default function App() {
     setRecording([]);
     setIsRecording(true);
   };
-
   const stopRecording = () => {
     recordingStart.current = 0;
     setIsRecording(false);
@@ -162,15 +136,7 @@ export default function App() {
   return (
     <main className="button-page">
       <ShareRecordButton recording={recording} />
-      <AuthControls
-        avatarUrl={profileAvatar}
-        isSignInOpen={isSignInOpen}
-        onAvatarChange={updateProfileAvatar}
-        onCloseSignIn={() => setIsSignInOpen(false)}
-        onOpenSignIn={() => setIsSignInOpen(true)}
-        onProfileCreated={setProfileName}
-        username={profileName}
-      />
+      {authControls}
       <PlayMusicButton isPlaying={isMusicPlaying} onPlay={playRandomMusic} />
       <p className="copyright-label">Copyright Iskander</p>
       <RecordingPanel
