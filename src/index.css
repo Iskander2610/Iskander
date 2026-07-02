@@ -1,11 +1,14 @@
 :root {
-  --bg: #f5f4ef;
-  --card: #fbfaf7;
+  --bg: #fbfbf5;
+  --card: #ffffff;
   --ink: #1a1a1a;
-  --soft: #5b5854;
-  --clay: #d97757;
-  --line: #e6e3da;
+  --soft: #71717a;
+  --clay: #000000;
+  --line: #e4e4e7;
+  --mint: #c1fbd4;
+  --pistachio: #d4f9e0;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-feature-settings: "ss03";
   color: var(--ink);
 }
 
@@ -45,7 +48,7 @@ input {
   flex: 1;
   padding: 12px 14px;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 8px;
   font-size: 16px;
   background: #fff;
   color: var(--ink);
@@ -54,11 +57,11 @@ input {
 button {
   padding: 12px 18px;
   border: none;
-  border-radius: 12px;
+  border-radius: 999px;
   background: var(--clay);
   color: #fff;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 550;
   cursor: pointer;
 }
 button:disabled { opacity: 0.6; cursor: default; }
@@ -109,6 +112,8 @@ button.small { padding: 6px 10px; font-size: 14px; }
   gap: 10px;
   padding: 12px;
   overflow-x: hidden;
+  background:
+    linear-gradient(180deg, var(--bg) 0%, #ffffff 54%, var(--pistachio) 100%);
 }
 
 .blocked-page,
@@ -122,12 +127,16 @@ button.small { padding: 6px 10px; font-size: 14px; }
 .blocked-page section,
 .join-page section {
   width: min(420px, 100%);
-  padding: 24px;
+  padding: 32px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 12px;
   background: var(--card);
   text-align: center;
-  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.12);
+  box-shadow:
+    0 8px 8px rgba(0, 0, 0, 0.1),
+    0 4px 4px rgba(0, 0, 0, 0.1),
+    0 2px 2px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(0, 0, 0, 0.08);
 }
 
 .blocked-page h1,
@@ -155,9 +164,9 @@ button.small { padding: 6px 10px; font-size: 14px; }
 }
 
 .share-record button {
-  border-radius: 8px;
-  padding: 9px 12px;
-  background: #1f8f6a;
+  border-radius: 999px;
+  padding: 9px 14px;
+  background: #000;
   font-size: 12px;
 }
 
@@ -167,9 +176,9 @@ button.small { padding: 6px 10px; font-size: 14px; }
   width: 100%;
   padding: 10px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.93);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
 .share-box label {
@@ -226,10 +235,11 @@ button.small { padding: 6px 10px; font-size: 14px; }
   left: 14px;
   bottom: 14px;
   z-index: 5;
-  border-radius: 8px;
-  padding: 10px 14px;
-  background: #6f42c1;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+  border-radius: 999px;
+  padding: 11px 18px;
+  background: var(--mint);
+  color: var(--ink);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14);
   font-size: 13px;
 }
 
@@ -248,9 +258,9 @@ button.small { padding: 6px 10px; font-size: 14px; }
   align-items: center;
   justify-content: center;
   gap: 10px;
-  border-radius: 8px;
+  border-radius: 999px;
   padding: 15px 30px;
-  background: var(--clay);
+  background: #000;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
   font-size: 20px;
   min-width: 120px;
@@ -270,9 +280,9 @@ button.small { padding: 6px 10px; font-size: 14px; }
   width: 190px;
   padding: 10px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
 .profile-popover p {
@@ -282,7 +292,7 @@ button.small { padding: 6px 10px; font-size: 14px; }
 }
 
 .profile-popover button {
-  border-radius: 7px;
+  border-radius: 999px;
   padding: 9px 10px;
   font-size: 12px;
 }
@@ -339,18 +349,18 @@ button.small { padding: 6px 10px; font-size: 14px; }
   display: grid;
   place-items: center;
   padding: 18px;
-  background: rgba(0, 0, 0, 0.32);
+  background: rgba(0, 0, 0, 0.42);
 }
 
 .auth-dialog {
   display: grid;
   gap: 14px;
   width: min(460px, 100%);
-  padding: 26px;
+  padding: 32px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 12px;
   background: var(--card);
-  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.24);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
 .auth-dialog-header {
@@ -362,6 +372,7 @@ button.small { padding: 6px 10px; font-size: 14px; }
 
 .auth-dialog-header h2 {
   font-size: 32px;
+  font-weight: 500;
 }
 
 .auth-dialog-header button {
@@ -378,7 +389,7 @@ button.small { padding: 6px 10px; font-size: 14px; }
   justify-content: center;
   gap: 10px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 999px;
   background: #fff;
   color: var(--ink);
   font-size: 17px;
@@ -415,6 +426,7 @@ button.small { padding: 6px 10px; font-size: 14px; }
 }
 
 .auth-dialog > button {
+  border-radius: 999px;
   padding: 15px 18px;
   font-size: 18px;
 }
@@ -433,7 +445,7 @@ button.small { padding: 6px 10px; font-size: 14px; }
   padding: 5px 8px;
   border: 1px solid var(--line);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.92);
   color: var(--soft);
   font-size: 11px;
   font-weight: 800;
@@ -449,9 +461,9 @@ button.small { padding: 6px 10px; font-size: 14px; }
   overflow: auto;
   padding: 10px;
   border: 1px solid var(--line);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.93);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.22);
 }
 
 .record-actions {
@@ -461,7 +473,7 @@ button.small { padding: 6px 10px; font-size: 14px; }
 }
 
 .record-actions button {
-  border-radius: 7px;
+  border-radius: 999px;
   padding: 8px 10px;
   font-size: 12px;
 }
@@ -622,13 +634,15 @@ button.small { padding: 6px 10px; font-size: 14px; }
   width: min(220px, 100%);
   padding: 10px;
   border: 1px solid var(--line);
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.74);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
 }
 
 .disc-tutorial h2 {
   margin-bottom: 8px;
   font-size: 14px;
+  font-weight: 500;
 }
 
 .disc-tutorial p {
@@ -699,7 +713,7 @@ button.small { padding: 6px 10px; font-size: 14px; }
 .sound-button p {
   color: var(--ink);
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 550;
   overflow-wrap: anywhere;
 }
 
@@ -708,10 +722,10 @@ button.small { padding: 6px 10px; font-size: 14px; }
   min-width: 22px;
   padding: 3px 5px;
   border: 1px solid var(--line);
-  border-radius: 6px;
+  border-radius: 999px;
   background: #fff;
   color: var(--soft);
-  font: 800 11px/1 Inter, system-ui, sans-serif;
+  font: 700 11px/1 Inter, system-ui, sans-serif;
 }
 
 .big-red-button {
