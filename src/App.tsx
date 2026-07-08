@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AuthControls } from './components/AuthControls';
 import { BackgroundPanel } from './components/BackgroundPanel';
+import { InitialPage } from './components/InitialPage';
+import { LoadingScreen } from './components/LoadingScreen';
 import { PlayMusicButton } from './components/PlayMusicButton';
 import { RecordingPanel } from './components/RecordingPanel';
 import { ShareRecordButton } from './components/ShareRecordButton';
@@ -24,6 +26,7 @@ import { soundKeys, soundNames, updateDiscSound } from './lib/soundButtons';
 import { useInspectBlocker } from './lib/useInspectBlocker';
 import { useKeyboardSounds } from './lib/useKeyboardSounds';
 import { useProfile } from './lib/useProfile';
+import { useSavedDjRecords } from './lib/useSavedDjRecords';
 
 export default function App() {
   useInspectBlocker();
@@ -40,6 +43,7 @@ export default function App() {
   const [isReplayLink] = useState(() => hasReplayLink());
   const [replayUsername] = useState(() => readReplayUsername());
   const profile = useProfile();
+  const records = useSavedDjRecords(profile.profileName);
   const recordingStart = useRef(0);
   const nextRecordingId = useRef(1);
   const playbackTimers = useRef<number[]>([]);
@@ -122,17 +126,11 @@ export default function App() {
       </main>
     );
   }
+  if (profile.isLoading) {
+    return <LoadingScreen />;
+  }
   if (!profile.profileName && !isReplayLink) {
-    return (
-      <main className="join-page">
-        {authControls}
-        <section>
-          <h1>Join Iskander DJ</h1>
-          <p>Sign in first to play the game.</p>
-        </section>
-        <p className="copyright-label">Copyright Iskander</p>
-      </main>
-    );
+    return <InitialPage authControls={authControls} />;
   }
   const startRecording = () => {
     clearPlayback();
@@ -150,6 +148,11 @@ export default function App() {
     if (recording.length === 0) return;
     playActions(recording, () => setIsPlaying(false));
     setIsPlaying(true);
+  };
+
+  const loadSavedRecord = (actions: RecordedAction[]) => {
+    clearPlayback();
+    setRecording(actions);
   };
 
   const playRandomMusic = async (choice: MusicChoice) => {
@@ -198,12 +201,18 @@ export default function App() {
         />
       ) : (
         <RecordingPanel
+          isSaving={records.isSavingRecord}
           isRecording={isRecording}
+          message={records.recordMessage}
+          onDeleteSaved={records.deleteRecord}
+          onLoadSaved={loadSavedRecord}
           recording={recording}
           isPlaying={isPlaying}
           onStart={startRecording}
           onStop={stopRecording}
           onPlay={playRecording}
+          onSave={() => void records.saveRecord(recording)}
+          savedRecords={records.savedRecords}
         />
       )}
       <Soundboard

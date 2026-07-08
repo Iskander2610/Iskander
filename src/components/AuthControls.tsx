@@ -37,9 +37,11 @@ export function AuthControls({
         {username ? (
           <ProfileMenu avatarUrl={avatarUrl} username={username} onAvatarChange={onAvatarChange} onLogOut={onLogOut} />
         ) : (
-          <button className="sign-in-button" type="button" onClick={onOpenSignIn}>Sign In</button>
+          <>
+            <button className="sign-in-button" type="button" onClick={onOpenSignIn}>Sign In</button>
+            <button className="sign-in-button" type="button" onClick={onOpenLogIn}>Log In</button>
+          </>
         )}
-        <button className="sign-in-button" type="button" onClick={onOpenLogIn}>Log In</button>
       </div>
       {isSignInOpen && (
         <SignInDialog onAccountCreated={onProfileCreated} onClose={onCloseSignIn} />

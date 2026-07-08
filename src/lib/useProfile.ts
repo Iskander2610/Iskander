@@ -4,6 +4,7 @@ import { supabase } from './supabase';
 
 export function useProfile() {
   const [isBlocked, setIsBlocked] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isLogInOpen, setIsLogInOpen] = useState(false);
   const [isSignInOpen, setIsSignInOpen] = useState(false);
   const [profileName, setProfileName] = useState('');
@@ -19,6 +20,8 @@ export function useProfile() {
       const metadata = data.user?.user_metadata;
       const username = metadata?.username ?? metadata?.name ?? metadata?.full_name ?? data.user?.email?.split('@')[0];
       if (typeof username === 'string') setProfileName(username);
+    }).finally(() => {
+      setIsLoading(false);
     });
     setProfileAvatar(localStorage.getItem('profile-avatar') ?? '');
   }, []);
@@ -37,6 +40,7 @@ export function useProfile() {
 
   return {
     isBlocked,
+    isLoading,
     isLogInOpen,
     isSignInOpen,
     profileAvatar,
