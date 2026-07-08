@@ -25,6 +25,7 @@ export function PlayMusicButton({ isPlaying, onPlay }: PlayMusicButtonProps) {
       </button>
       {isOpen && (
         <div className="music-options">
+          <p>Choose a song</p>
           <button type="button" onClick={() => chooseMusic('music-1')}>Music 1</button>
           <button type="button" onClick={() => chooseMusic('music-2')}>Music 2</button>
         </div>

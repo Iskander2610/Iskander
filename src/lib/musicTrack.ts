@@ -1,7 +1,7 @@
 let musicAudio: AudioContext | undefined;
 
-export function playMusicTrack(choice: 'music-1' | 'music-2') {
-  const audio = getMusicAudio();
+export async function playMusicTrack(choice: 'music-1' | 'music-2') {
+  const audio = await getMusicAudio();
   const start = audio.currentTime + 0.05;
   const beat = choice === 'music-1' ? 0.36 : 0.3;
   const notes = choice === 'music-1'
@@ -24,9 +24,9 @@ export function playMusicTrack(choice: 'music-1' | 'music-2') {
   return 16 * beat + 0.7;
 }
 
-function getMusicAudio() {
+async function getMusicAudio() {
   const audio = musicAudio ??= new AudioContext();
-  if (audio.state === 'suspended') void audio.resume();
+  if (audio.state === 'suspended') await audio.resume();
   return audio;
 }
 

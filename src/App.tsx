@@ -1,10 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { AuthControls } from './components/AuthControls';
+import { BackgroundPanel } from './components/BackgroundPanel';
 import { PlayMusicButton } from './components/PlayMusicButton';
 import { RecordingPanel } from './components/RecordingPanel';
 import { ShareRecordButton } from './components/ShareRecordButton';
 import { SharedReplayPanel } from './components/SharedReplayPanel';
 import { Soundboard } from './components/Soundboard';
+import {
+  getBackgroundStyle,
+  loadBackgroundChoice,
+  loadBackgroundPhoto,
+  saveBackgroundChoice,
+  saveBackgroundPhoto,
+  type BackgroundChoice,
+} from './lib/backgroundCustomization';
 import { getNextButtonColor, loadButtonColors, saveButtonColors } from './lib/buttonCustomization';
 import { playRecordedAction } from './lib/djControls';
 import { playMusicTrack } from './lib/musicTrack';
@@ -23,6 +32,8 @@ export default function App() {
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isCustomizing, setIsCustomizing] = useState(false);
+  const [backgroundChoice, setBackgroundChoice] = useState(() => loadBackgroundChoice());
+  const [backgroundPhoto, setBackgroundPhoto] = useState(() => loadBackgroundPhoto());
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
   const [customButtonColors, setCustomButtonColors] = useState(() => loadButtonColors());
   const [recording, setRecording] = useState<RecordedAction[]>(() => readReplayRecording());
@@ -54,6 +65,16 @@ export default function App() {
       saveButtonColors(nextColors);
       return nextColors;
     });
+  }, []);
+  const selectBackground = useCallback((choice: BackgroundChoice) => {
+    setBackgroundChoice(choice);
+    saveBackgroundChoice(choice);
+  }, []);
+  const selectBackgroundPhoto = useCallback((photo: string) => {
+    setBackgroundPhoto(photo);
+    setBackgroundChoice('photo');
+    saveBackgroundPhoto(photo);
+    saveBackgroundChoice('photo');
   }, []);
   useEffect(() => {
     updateDiscSound(spinSpeed);
@@ -130,9 +151,9 @@ export default function App() {
     setIsPlaying(true);
   };
 
-  const playRandomMusic = (choice: MusicChoice) => {
+  const playRandomMusic = async (choice: MusicChoice) => {
     const music = createMusicPerformance(choice);
-    const musicDuration = playMusicTrack(choice);
+    const musicDuration = await playMusicTrack(choice);
     playActions(music, () => setIsMusicPlaying(false));
     setIsMusicPlaying(true);
     playbackTimers.current.push(window.setTimeout(() => setIsMusicPlaying(false), musicDuration * 1000));
@@ -148,7 +169,7 @@ export default function App() {
   };
 
   return (
-    <main className="button-page">
+    <main className="button-page" style={getBackgroundStyle(backgroundChoice, backgroundPhoto)}>
       <ShareRecordButton recording={recording} username={profile.profileName || replayUsername} />
       {authControls}
       <PlayMusicButton isPlaying={isMusicPlaying} onPlay={playRandomMusic} />
@@ -157,6 +178,13 @@ export default function App() {
           {isCustomizing ? 'Done' : 'Customize'}
         </button>
         {isCustomizing && <p>Click buttons to change colors</p>}
+        {isCustomizing && (
+          <BackgroundPanel
+            onPhotoChange={selectBackgroundPhoto}
+            onSelect={selectBackground}
+            selected={backgroundChoice}
+          />
+        )}
       </div>
       <p className="copyright-label">Copyright Iskander</p>
       {isReplayLink ? (
