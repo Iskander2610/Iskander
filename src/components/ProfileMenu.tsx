@@ -4,9 +4,10 @@ type ProfileMenuProps = {
   avatarUrl: string;
   username: string;
   onAvatarChange: (avatarUrl: string) => void;
+  onLogOut: () => void;
 };
 
-export function ProfileMenu({ avatarUrl, username, onAvatarChange }: ProfileMenuProps) {
+export function ProfileMenu({ avatarUrl, username, onAvatarChange, onLogOut }: ProfileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -33,6 +34,7 @@ export function ProfileMenu({ avatarUrl, username, onAvatarChange }: ProfileMenu
         <div className="profile-popover">
           <p>My Profile</p>
           <button type="button" onClick={choosePicture}>Edit picture</button>
+          <button type="button" onClick={onLogOut}>Log out</button>
           <input
             ref={fileInput}
             type="file"

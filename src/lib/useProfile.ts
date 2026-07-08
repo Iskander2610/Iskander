@@ -28,6 +28,13 @@ export function useProfile() {
     localStorage.setItem('profile-avatar', avatarUrl);
   };
 
+  const logOut = async () => {
+    await supabase.auth.signOut();
+    setProfileName('');
+    setIsLogInOpen(false);
+    setIsSignInOpen(false);
+  };
+
   return {
     isBlocked,
     isLogInOpen,
@@ -37,6 +44,7 @@ export function useProfile() {
     setIsLogInOpen,
     setIsSignInOpen,
     setProfileName,
+    logOut,
     updateProfileAvatar,
   };
 }

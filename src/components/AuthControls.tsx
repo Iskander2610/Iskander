@@ -10,6 +10,7 @@ type AuthControlsProps = {
   onCloseLogIn: () => void;
   onCloseSignIn: () => void;
   onLogIn: (username: string) => void;
+  onLogOut: () => void;
   onOpenLogIn: () => void;
   onOpenSignIn: () => void;
   onProfileCreated: (username: string) => void;
@@ -24,6 +25,7 @@ export function AuthControls({
   onCloseLogIn,
   onCloseSignIn,
   onLogIn,
+  onLogOut,
   onOpenLogIn,
   onOpenSignIn,
   onProfileCreated,
@@ -33,7 +35,7 @@ export function AuthControls({
     <>
       <div className="auth-buttons">
         {username ? (
-          <ProfileMenu avatarUrl={avatarUrl} username={username} onAvatarChange={onAvatarChange} />
+          <ProfileMenu avatarUrl={avatarUrl} username={username} onAvatarChange={onAvatarChange} onLogOut={onLogOut} />
         ) : (
           <button className="sign-in-button" type="button" onClick={onOpenSignIn}>Sign In</button>
         )}

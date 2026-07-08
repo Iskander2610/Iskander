@@ -98,6 +98,7 @@ export default function App() {
       onCloseLogIn={() => profile.setIsLogInOpen(false)}
       onCloseSignIn={() => profile.setIsSignInOpen(false)}
       onLogIn={profile.setProfileName}
+      onLogOut={profile.logOut}
       onOpenLogIn={() => {
         profile.setIsSignInOpen(false);
         profile.setIsLogInOpen(true);
