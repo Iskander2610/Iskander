@@ -3,11 +3,14 @@ import { AuthControls } from './components/AuthControls';
 import { PlayMusicButton } from './components/PlayMusicButton';
 import { RecordingPanel } from './components/RecordingPanel';
 import { ShareRecordButton } from './components/ShareRecordButton';
+import { SharedReplayPanel } from './components/SharedReplayPanel';
 import { Soundboard } from './components/Soundboard';
+import { getNextButtonColor, loadButtonColors, saveButtonColors } from './lib/buttonCustomization';
 import { playRecordedAction } from './lib/djControls';
 import { playMusicTrack } from './lib/musicTrack';
-import { createMusicPerformance } from './lib/randomMusic';
+import { createMusicPerformance, type MusicChoice } from './lib/randomMusic';
 import type { NewRecordedAction, RecordedAction } from './lib/recording';
+import { hasReplayLink, readReplayRecording, readReplayUsername } from './lib/replayLink';
 import { soundKeys, soundNames, updateDiscSound } from './lib/soundButtons';
 import { useInspectBlocker } from './lib/useInspectBlocker';
 import { useKeyboardSounds } from './lib/useKeyboardSounds';
@@ -19,8 +22,12 @@ export default function App() {
   const [spinSpeed, setSpinSpeed] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isCustomizing, setIsCustomizing] = useState(false);
   const [isMusicPlaying, setIsMusicPlaying] = useState(false);
-  const [recording, setRecording] = useState<RecordedAction[]>([]);
+  const [customButtonColors, setCustomButtonColors] = useState(() => loadButtonColors());
+  const [recording, setRecording] = useState<RecordedAction[]>(() => readReplayRecording());
+  const [isReplayLink] = useState(() => hasReplayLink());
+  const [replayUsername] = useState(() => readReplayUsername());
   const profile = useProfile();
   const recordingStart = useRef(0);
   const nextRecordingId = useRef(1);
@@ -41,13 +48,20 @@ export default function App() {
   const recordSound = useCallback((index: number) => {
     recordAction({ type: 'sound', index, label: `${soundKeys[index].toUpperCase()} ${soundNames[index]}` });
   }, [recordAction]);
+  const customizeButton = useCallback((index: number) => {
+    setCustomButtonColors((colors) => {
+      const nextColors = { ...colors, [index]: getNextButtonColor(index, colors) };
+      saveButtonColors(nextColors);
+      return nextColors;
+    });
+  }, []);
   useEffect(() => {
     updateDiscSound(spinSpeed);
   }, [spinSpeed]);
   useEffect(() => clearPlayback, [clearPlayback]);
 
   useKeyboardSounds({
-    isDisabled: profile.isBlocked || profile.isLogInOpen || profile.isSignInOpen || !profile.profileName,
+    isDisabled: isCustomizing || profile.isBlocked || profile.isLogInOpen || profile.isSignInOpen || !profile.profileName,
     recordAction,
     recordSound,
     setDiscAngle,
@@ -86,7 +100,7 @@ export default function App() {
       </main>
     );
   }
-  if (!profile.profileName) {
+  if (!profile.profileName && !isReplayLink) {
     return (
       <main className="join-page">
         {authControls}
@@ -116,9 +130,9 @@ export default function App() {
     setIsPlaying(true);
   };
 
-  const playRandomMusic = () => {
-    const music = createMusicPerformance();
-    const musicDuration = playMusicTrack();
+  const playRandomMusic = (choice: MusicChoice) => {
+    const music = createMusicPerformance(choice);
+    const musicDuration = playMusicTrack(choice);
     playActions(music, () => setIsMusicPlaying(false));
     setIsMusicPlaying(true);
     playbackTimers.current.push(window.setTimeout(() => setIsMusicPlaying(false), musicDuration * 1000));
@@ -135,19 +149,42 @@ export default function App() {
 
   return (
     <main className="button-page">
-      <ShareRecordButton recording={recording} />
+      <ShareRecordButton recording={recording} username={profile.profileName || replayUsername} />
       {authControls}
       <PlayMusicButton isPlaying={isMusicPlaying} onPlay={playRandomMusic} />
+      <div className="customize-panel">
+        <button type="button" onClick={() => setIsCustomizing((customizing) => !customizing)}>
+          {isCustomizing ? 'Done' : 'Customize'}
+        </button>
+        {isCustomizing && <p>Click buttons to change colors</p>}
+      </div>
       <p className="copyright-label">Copyright Iskander</p>
-      <RecordingPanel
-        isRecording={isRecording}
-        recording={recording}
-        isPlaying={isPlaying}
-        onStart={startRecording}
-        onStop={stopRecording}
-        onPlay={playRecording}
+      {isReplayLink ? (
+        <SharedReplayPanel
+          isPlaying={isPlaying}
+          onPause={clearPlayback}
+          onPlay={playRecording}
+          recording={recording}
+          username={replayUsername}
+        />
+      ) : (
+        <RecordingPanel
+          isRecording={isRecording}
+          recording={recording}
+          isPlaying={isPlaying}
+          onStart={startRecording}
+          onStop={stopRecording}
+          onPlay={playRecording}
+        />
+      )}
+      <Soundboard
+        buttonColors={customButtonColors}
+        discAngle={discAngle}
+        isCustomizing={isCustomizing}
+        onCustomizeButton={customizeButton}
+        onRecordSound={recordSound}
+        spinSpeed={spinSpeed}
       />
-      <Soundboard discAngle={discAngle} onRecordSound={recordSound} spinSpeed={spinSpeed} />
     </main>
   );
 }

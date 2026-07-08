@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import type { RecordedAction } from '../lib/recording';
+import { buildReplayLink } from '../lib/replayLink';
 
 type ShareRecordButtonProps = {
   recording: RecordedAction[];
+  username: string;
 };
 
-export function ShareRecordButton({ recording }: ShareRecordButtonProps) {
+export function ShareRecordButton({ recording, username }: ShareRecordButtonProps) {
   const [message, setMessage] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [showSocialOptions, setShowSocialOptions] = useState(false);
@@ -14,14 +16,15 @@ export function ShareRecordButton({ recording }: ShareRecordButtonProps) {
 
   const shareRecord = async (mode: 'copy' | 'email') => {
     if (!hasRecord) return;
-    const text = buildShareText(recording, target);
+    const link = buildReplayLink(recording, username);
+    const text = buildShareText(recording, target, link);
     try {
       if (mode === 'email') {
         window.location.href = buildEmailLink(text, target);
         setMessage('Email opened');
       } else {
-        await navigator.clipboard.writeText(text);
-        setMessage('Copied');
+        await navigator.clipboard.writeText(link);
+        setMessage('Replay link copied');
       }
     } catch (error) {
       if (error instanceof DOMException && error.name === 'AbortError') return;
@@ -30,14 +33,15 @@ export function ShareRecordButton({ recording }: ShareRecordButtonProps) {
   };
 
   const shareToSocial = async (social: 'Telegram' | 'Instagram' | 'TikTok' | 'YouTube') => {
-    const text = buildShareText(recording, target);
+    const link = buildReplayLink(recording, username);
+    const text = buildShareText(recording, target, link);
     if (social === 'Telegram') {
-      window.open(`https://t.me/share/url?text=${encodeURIComponent(text)}`, '_blank', 'noopener,noreferrer');
-      setMessage('Telegram opened');
+      window.open(buildTelegramLink(link, text), '_blank', 'noopener,noreferrer');
+      setMessage('Choose a chat in Telegram');
       return;
     }
-    await navigator.clipboard.writeText(text);
-    setMessage(`Copied for ${social}`);
+    await navigator.clipboard.writeText(link);
+    setMessage(`Replay link copied for ${social}`);
   };
 
   return (
@@ -81,10 +85,10 @@ export function ShareRecordButton({ recording }: ShareRecordButtonProps) {
   );
 }
 
-function buildShareText(recording: RecordedAction[], target: string) {
+function buildShareText(recording: RecordedAction[], target: string, link: string) {
   const lines = recording.map((action) => `${action.time.toFixed(1)}s - ${action.label}`);
   const targetLine = target.trim() ? [`To: ${target.trim()}`] : [];
-  return ['My DJ record:', ...targetLine, ...lines].join('\n');
+  return ['My DJ record:', link, ...targetLine, ...lines].join('\n');
 }
 
 function buildEmailLink(text: string, target: string) {
@@ -92,4 +96,10 @@ function buildEmailLink(text: string, target: string) {
   const subject = encodeURIComponent('My DJ Record');
   const body = encodeURIComponent(text);
   return `mailto:${encodeURIComponent(email)}?subject=${subject}&body=${body}`;
+}
+
+function buildTelegramLink(link: string, text: string) {
+  const url = encodeURIComponent(link);
+  const shareText = encodeURIComponent(text);
+  return `https://t.me/share/url?url=${url}&text=${shareText}`;
 }
