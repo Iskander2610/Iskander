@@ -34,9 +34,8 @@ export function ShareRecordButton({ recording, username }: ShareRecordButtonProp
 
   const shareToSocial = async (social: 'Telegram' | 'Instagram' | 'TikTok' | 'YouTube') => {
     const link = buildReplayLink(recording, username);
-    const text = buildShareText(recording, target, link);
     if (social === 'Telegram') {
-      window.open(buildTelegramLink(link, text), '_blank', 'noopener,noreferrer');
+      window.open(buildTelegramLink(link, username), '_blank', 'noopener,noreferrer');
       setMessage('Choose a chat in Telegram');
       return;
     }
@@ -98,8 +97,8 @@ function buildEmailLink(text: string, target: string) {
   return `mailto:${encodeURIComponent(email)}?subject=${subject}&body=${body}`;
 }
 
-function buildTelegramLink(link: string, text: string) {
+function buildTelegramLink(link: string, username: string) {
   const url = encodeURIComponent(link);
-  const shareText = encodeURIComponent(text);
+  const shareText = encodeURIComponent(`${username || 'Someone'} made a DJ record. Open it and press Play.`);
   return `https://t.me/share/url?url=${url}&text=${shareText}`;
 }
